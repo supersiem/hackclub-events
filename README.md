@@ -4,6 +4,8 @@ This is a simple React app that displays Hack Club events.
 It uses the Hack Club API to fetch events and show them in a list.
 It also includes a search box to filter events by name or description.
 
+Note: This is only a list of the events and the rederect to the offica l Hack Club events page.
+
 ## Development
 
 Requirements:
