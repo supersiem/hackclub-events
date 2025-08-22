@@ -20,22 +20,22 @@ type Item = {
 const usePlaceholders = false;
 
 export default function List() {
-
     const [items, setItems] = useState<Item[]>([]);
+    let fzf: any;
     const [itemsBackup, setItemsBackup] = useState<Item[]>([]);
-    function searchfunction(items: Item[]) {
-        const options = {
-            keys: ['title', 'desc', 'leader'],
-            threshold: 0.3,
-        }
-        const fzf = new Fuse(items, options);
-        let search = document.getElementById("search") as HTMLInputElement;
-        let results = fzf.search(search.value);
-        if (search.value === "") {
+    function searchfunction() {
+        let searchBar = document.getElementById("search") as HTMLInputElement;
+        if (!searchBar.value) {
             setItems(itemsBackup);
             return;
         }
-        setItems(results.map(result => result.item));
+        const options = {
+            keys: ['title', 'desc', 'leader'],
+            threshold: 0.3,
+        };
+        fzf = new Fuse(itemsBackup, options);
+        const result = fzf.search(searchBar.value);
+        setItems(result.map((r: any) => r.item));
     }
 
     useEffect(() => {
@@ -102,7 +102,10 @@ export default function List() {
                 }
             ])
             setItemsBackup(items)
+
         }
+
+
     }, []);
     return (
         <div className="container">
@@ -118,7 +121,7 @@ export default function List() {
                 type="text"
                 id="search"
                 placeholder="Search events..."
-                onChange={() => { searchfunction(items) }}
+                onChange={searchfunction}
             /> <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
                 {items.map((itemthing) => renderItem(itemthing))}
             </ul>
