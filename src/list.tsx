@@ -1,5 +1,5 @@
 
-
+import Fuse from "fuse.js";
 import { useEffect, useState } from "react";
 
 type Item = {
@@ -19,9 +19,24 @@ type Item = {
 };
 const usePlaceholders = false;
 
-
 export default function List() {
+
     const [items, setItems] = useState<Item[]>([]);
+    const [itemsBackup, setItemsBackup] = useState<Item[]>([]);
+    function searchfunction(items: Item[]) {
+        const options = {
+            keys: ['title', 'desc', 'leader'],
+            threshold: 0.3,
+        }
+        const fzf = new Fuse(items, options);
+        let search = document.getElementById("search") as HTMLInputElement;
+        let results = fzf.search(search.value);
+        if (search.value === "") {
+            setItems(itemsBackup);
+            return;
+        }
+        setItems(results.map(result => result.item));
+    }
 
     useEffect(() => {
         document.title = "Upcoming Events - Hack Club";
@@ -50,10 +65,12 @@ export default function List() {
                         amaName: d.amaName ?? undefined,
                     }));
                     setItems(mapped);
+                    setItemsBackup(mapped);
                 })
                 .catch((err) => {
                     console.error(err);
                     setItems([]);
+                    setItemsBackup([]);
                 });
         } else {
             setItems([
@@ -84,6 +101,7 @@ export default function List() {
                     amaId: "test2",
                 }
             ])
+            setItemsBackup(items)
         }
     }, []);
     return (
@@ -95,7 +113,13 @@ export default function List() {
                 <option value="true">Only ask me anything</option>
                 <option value="false">No ask me anything</option>
             </select>
-            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+
+            <input
+                type="text"
+                id="search"
+                placeholder="Search events..."
+                onChange={() => { searchfunction(items) }}
+            /> <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
                 {items.map((itemthing) => renderItem(itemthing))}
             </ul>
         </div>
@@ -158,3 +182,4 @@ function filterfucntion(item: Item) {
         return true;
     }
 }
+
