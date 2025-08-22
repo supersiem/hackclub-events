@@ -39,7 +39,6 @@ export default function List() {
     }
 
     useEffect(() => {
-        document.title = "Upcoming Events - Hack Club";
         if (!usePlaceholders) {
             const API = "https://events.hackclub.com/api/events/upcoming";
             const url = `https://corsproxy.io/?${encodeURIComponent(API)}`;
@@ -117,6 +116,11 @@ export default function List() {
                 <option value="false">No ask me anything</option>
             </select>
 
+            <select name="d" id="d" onChange={() => { setItems([...items]) }}>
+                <option value="true">Only future events</option>
+                <option value="false">All recent events</option>
+            </select>
+
             <input
                 type="text"
                 id="search"
@@ -173,6 +177,11 @@ function renderItem(item: Item) {
     )
 }
 function filterfucntion(item: Item) {
+    let d = document.getElementById("d") as HTMLSelectElement;
+    if (d.value == "true" && item.start < new Date()) {
+        console.log("event is in the past, skipping")
+        return false;
+    }
     let ama = document.getElementById("ama") as HTMLSelectElement;
     if (ama.value == "true") {
         console.log("ama is true")
